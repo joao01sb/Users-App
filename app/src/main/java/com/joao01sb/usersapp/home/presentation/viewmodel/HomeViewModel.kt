@@ -54,8 +54,8 @@ class HomeViewModel(
                     }
                 }
             } catch (e: Exception) {
-                Log.e("HomeViewModel", "Erro inesperado ao carregar dados iniciais", e)
-                _uiState.update { it.copy(isLoading = false, isErro = Pair(true, "Erro ao carregar dados.")) }
+                Log.e("HomeViewModel", "Unexpected error loading initial data", e)
+                _uiState.update { it.copy(isLoading = false, isErro = Pair(true, "Error loading data.")) }
                 fetchRemoteUsers(isInitialLoad = true)
             }
         }
@@ -79,8 +79,8 @@ class HomeViewModel(
                 .collect { result ->
                     when (result) {
                         is ResultWrapper.Error -> {
-                            Log.e("HomeViewModel", "Erro da API: ${result.error.message}")
-                            handleRemoteFetchError(result.error.message ?: "Erro desconhecido da API", isInitialLoad)
+                            Log.e("HomeViewModel", "Error from API: ${result.error.message}")
+                            handleRemoteFetchError(result.error.message ?: "Unknown API error", isInitialLoad)
                         }
                         is ResultWrapper.Loading -> {
                             if (isInitialLoad) {
@@ -88,7 +88,7 @@ class HomeViewModel(
                             }
                         }
                         is ResultWrapper.Sucess -> {
-                            Log.d("HomeViewModel", "Dados recebidos da API: ${result.result.size} usuários")
+                            Log.d("HomeViewModel", "Data received from API: ${result.result.size} users")
                             try {
                                 saveUserUseCase.invoke(result.result)
                                 _uiState.update {
@@ -99,11 +99,11 @@ class HomeViewModel(
                                     )
                                 }
                                 if (!isInitialLoad) {
-                                    _uiEvents.emit(UiEvent.ShowSnackbar("Dados sincronizados."))
+                                    _uiEvents.emit(UiEvent.ShowSnackbar("Synchronized data."))
                                 }
                             } catch (e: Exception) {
-                                Log.e("HomeViewModel", "Erro ao salvar usuários no banco", e)
-                                _uiEvents.emit(UiEvent.ShowSnackbar("Erro ao salvar dados localmente."))
+                                Log.e("HomeViewModel", "Error saving users to the database", e)
+                                _uiEvents.emit(UiEvent.ShowSnackbar("Error saving data locally."))
                                 _uiState.update { it.copy(isLoading = false) }
                             }
                         }
@@ -117,11 +117,11 @@ class HomeViewModel(
             if (isInitialLoad && currentState.users.isEmpty()) {
                 currentState.copy(
                     isLoading = false,
-                    isErro = Pair(true, "Não foi possível carregar os usuários: $errorMessage")
+                    isErro = Pair(true, "Unable to load users: $errorMessage")
                 )
             } else {
-                _uiEvents.emit(UiEvent.ShowSnackbar("Não foi possível sincronizar: $errorMessage"))
-                currentState.copy(isLoading = false) // Garante que parou o loading se estava ativo
+                _uiEvents.emit(UiEvent.ShowSnackbar("Unable to sync: $errorMessage"))
+                currentState.copy(isLoading = false)
             }
         }
     }
