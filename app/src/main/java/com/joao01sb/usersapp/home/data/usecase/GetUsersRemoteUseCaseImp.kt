@@ -1,0 +1,24 @@
+package com.joao01sb.usersapp.home.data.usecase
+
+import com.joao01sb.usersapp.core.domain.model.User
+import com.joao01sb.usersapp.core.utils.ResultWrapper
+import com.joao01sb.usersapp.home.domain.repository.UserRemoteRepository
+import com.joao01sb.usersapp.home.domain.usecase.GetUsersRemoteUseCase
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+
+class GetUsersRemoteUseCaseImp(
+    private val userRepository: UserRemoteRepository
+) : GetUsersRemoteUseCase {
+
+    override suspend fun invoke(): Flow<ResultWrapper<List<User>>> = flow {
+        emit(ResultWrapper.Loading)
+        try {
+            userRepository.getUsersRemote().collect {
+                emit(it)
+            }
+        } catch (e: Exception) {
+            emit(ResultWrapper.Error(e))
+        }
+    }
+}

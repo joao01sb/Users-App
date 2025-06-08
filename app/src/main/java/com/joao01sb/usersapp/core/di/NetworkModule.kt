@@ -17,12 +17,6 @@ val networkModule = module {
     }
 }
 
-sealed class ResultApiService<out T> {
-    object Loading: ResultApiService<Nothing>()
-    data class Sucess<T>(val result: T) : ResultApiService<T>()
-    data class Error(val error: Throwable) : ResultApiService<Nothing>()
-}
-
 fun providerOkHttpClient(): OkHttpClient =
     OkHttpClient.Builder()
         .callTimeout(10, TimeUnit.SECONDS)

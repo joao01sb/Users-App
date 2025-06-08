@@ -1,6 +1,7 @@
 package com.joao01sb.usersapp
 
 import android.app.Application
+import com.joao01sb.usersapp.core.di.localDatabaseModule
 import com.joao01sb.usersapp.core.di.networkModule
 import com.joao01sb.usersapp.home.di.homeModule
 import org.koin.android.ext.koin.androidContext
@@ -15,7 +16,7 @@ class App : Application() {
         startKoin {
             androidLogger(Level.DEBUG)
             androidContext(this@App)
-            modules(networkModule + homeModule)
+            modules(localDatabaseModule + networkModule + homeModule)
         }
     }
 
