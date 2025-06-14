@@ -39,7 +39,7 @@ class HomeViewModel(
         loadInitialUsers()
     }
 
-    private fun loadInitialUsers() {
+    fun loadInitialUsers() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, isErro = null) }
             try {
@@ -87,7 +87,7 @@ class HomeViewModel(
                                 _uiState.update { it.copy(isLoading = true) }
                             }
                         }
-                        is ResultWrapper.Sucess -> {
+                        is ResultWrapper.Success -> {
                             Log.d("HomeViewModel", "Data received from API: ${result.result.size} users")
                             try {
                                 saveUserUseCase.invoke(result.result)
