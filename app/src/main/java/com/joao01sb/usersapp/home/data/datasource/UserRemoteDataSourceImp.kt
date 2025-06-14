@@ -1,6 +1,7 @@
 package com.joao01sb.usersapp.home.data.datasource
 
 import com.joao01sb.usersapp.core.data.remote.ApiService
+import com.joao01sb.usersapp.core.data.remote.dto.UserDto
 import com.joao01sb.usersapp.core.domain.model.User
 import com.joao01sb.usersapp.core.utils.ResultWrapper
 import com.joao01sb.usersapp.home.domain.datasource.UserRemoteDataSource
@@ -11,7 +12,7 @@ class UserRemoteDataSourceImp(
     private val apiService: ApiService
 ) : UserRemoteDataSource {
 
-    override suspend fun getUsers(): Flow<ResultWrapper<List<User>>> {
+    override suspend fun getUsers(): Flow<ResultWrapper<List<UserDto>>> {
         val result = apiService.getAllUSers()
         return if (result.isSuccessful) {
             flowOf(ResultWrapper.Sucess(result.body() ?: emptyList()))

@@ -1,5 +1,6 @@
 package com.joao01sb.usersapp.home.data.usecase
 
+import com.joao01sb.usersapp.core.domain.mapper.toModel
 import com.joao01sb.usersapp.core.domain.model.User
 import com.joao01sb.usersapp.core.utils.ResultWrapper
 import com.joao01sb.usersapp.home.domain.repository.UserRemoteRepository
@@ -15,7 +16,7 @@ class GetUsersRemoteUseCaseImp(
         emit(ResultWrapper.Loading)
         try {
             userRepository.getUsersRemote().collect {
-                emit(it)
+                emit(it.map { it.map { it.toModel() } })
             }
         } catch (e: Exception) {
             emit(ResultWrapper.Error(e))

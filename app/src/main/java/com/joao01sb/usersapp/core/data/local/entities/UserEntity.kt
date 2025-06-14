@@ -12,8 +12,8 @@ data class UserEntity(
     val name: String,
     val username: String,
     val email: String,
-    @Embedded(prefix = "_address") val address: AddressEmbedded,
+    @Embedded(prefix = "_address") val address: AddressEntity,
     val phone: String,
     val website: String,
-    @Embedded(prefix = "_company") val company: CompanyEmbedded
+    @Embedded(prefix = "_company") val company: CompanyEntity
 )
