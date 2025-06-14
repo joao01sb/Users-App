@@ -16,7 +16,11 @@ class GetUsersRemoteUseCaseImp(
         emit(ResultWrapper.Loading)
         try {
             userRepository.getUsersRemote().collect {
-                emit(it.map { it.map { it.toModel() } })
+                if (it is ResultWrapper.Success && it.result.isNotEmpty()) {
+                    emit(it.map { it.map { it.toModel() } })
+                } else {
+                    emit(ResultWrapper.Error(RuntimeException("empty users")))
+                }
             }
         } catch (e: Exception) {
             emit(ResultWrapper.Error(e))
