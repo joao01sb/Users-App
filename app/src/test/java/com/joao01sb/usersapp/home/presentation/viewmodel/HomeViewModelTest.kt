@@ -32,10 +32,6 @@ class HomeViewModelTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-//    @OptIn(ExperimentalCoroutinesApi::class)
-//    @get:Rule
-//    val mainDispatcherRule = MainDispatcherRule()
-
     private lateinit var viewModel: HomeViewModel
     private lateinit var getRemoteUsersUseCase: GetUsersRemoteUseCase
     private lateinit var getLocalUsersUseCase: GetUsersLocalUseCase
