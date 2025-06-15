@@ -30,7 +30,8 @@ import com.joao01sb.usersapp.home.presentation.state.UiState
 fun HomeScreen(
     modifier: Modifier = Modifier,
     uiState: UiState = UiState(),
-    onRetry: () -> Unit = {}
+    onRetry: () -> Unit = {},
+    onClickUser: (Int) -> Unit = {}
 ) {
 
     Column(
@@ -48,7 +49,8 @@ fun HomeScreen(
                 items(uiState.users) {
                     UserComp(
                         modifier = Modifier.fillMaxWidth(),
-                        it
+                        user = it,
+                        onClick = onClickUser
                     )
                 }
             }
