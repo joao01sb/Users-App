@@ -7,6 +7,8 @@ import com.joao01sb.usersapp.details.data.usecase.GetUserByIdImp
 import com.joao01sb.usersapp.details.domain.datasource.LocalDataSource
 import com.joao01sb.usersapp.details.domain.repository.UserDetailsRepository
 import com.joao01sb.usersapp.details.domain.usecase.GetUserById
+import com.joao01sb.usersapp.details.presentation.viewmodel.DetailsViewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val detailsModule = module {
@@ -20,6 +22,8 @@ val detailsModule = module {
     single<GetUserById> {
         GetUserByIdImp(repository = get<UserDetailsRepository>())
     }
-
+    viewModel {
+        DetailsViewModel(getUserById = get<GetUserById>(), savedStateHandle = get())
+    }
 
 }
