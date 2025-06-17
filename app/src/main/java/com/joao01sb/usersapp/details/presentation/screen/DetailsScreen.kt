@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +19,9 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,50 +34,89 @@ import com.joao01sb.usersapp.core.domain.model.Company
 import com.joao01sb.usersapp.core.domain.model.Geo
 import com.joao01sb.usersapp.core.domain.model.User
 import com.joao01sb.usersapp.core.presentation.components.UserAvatar
+import com.joao01sb.usersapp.core.utils.ResultWrapper
 import com.joao01sb.usersapp.details.presentation.components.DetailSection
 import com.joao01sb.usersapp.details.presentation.components.InfoItem
 import com.joao01sb.usersapp.details.presentation.components.UserDetailHeader
+import com.joao01sb.usersapp.details.presentation.state.UiState
 
 @Composable
 fun DetailsScreen(
     modifier: Modifier = Modifier,
-    user: User,
+    state: UiState = UiState(),
     onBack: () -> Unit = {}
 ) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color.Black)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        item {
-            Card(
-                modifier = modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Green)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    UserDetailHeader(user = user)
-                    DetailSection(title = "Contato") {
-                        InfoItem(icon = Icons.Outlined.Email, text = user.email)
-                        InfoItem(icon = Icons.Outlined.Phone, text = user.phone)
-                        InfoItem(icon = Icons.Outlined.Info, text = user.website)
-                    }
-                    DetailSection(title = "Endereço") {
-                        InfoItem(icon = Icons.Outlined.LocationOn, text = user.address.street)
-                        InfoItem(icon = Icons.Outlined.Info, text = user.address.suite)
-                        InfoItem(icon = Icons.Outlined.Info, text = user.address.city)
-                    }
-                    DetailSection(title = "Empresa") {
-                        InfoItem(icon = Icons.Outlined.Info, text = user.company.name)
-                        InfoItem(icon = Icons.Outlined.Info, text = user.company.catchPhrase)
-                    }
 
+    when (state.result) {
+        is ResultWrapper.Error -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color.Black)
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "Error: ${state.result.error.message}")
+                TextButton(onBack) {
+                    Text(text = "Back")
+                }
+            }
+        }
+
+        is ResultWrapper.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color.Black),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        is ResultWrapper.Success<*> -> {
+            val user = state.result.result as User
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color.Black)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                item {
+                    Card(
+                        modifier = modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.Green)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            UserDetailHeader(user = user)
+                            DetailSection(title = "Contato") {
+                                InfoItem(icon = Icons.Outlined.Email, text = user.email)
+                                InfoItem(icon = Icons.Outlined.Phone, text = user.phone)
+                                InfoItem(icon = Icons.Outlined.Info, text = user.website)
+                            }
+                            DetailSection(title = "Endereço") {
+                                InfoItem(
+                                    icon = Icons.Outlined.LocationOn,
+                                    text = user.address.street
+                                )
+                                InfoItem(icon = Icons.Outlined.Info, text = user.address.suite)
+                                InfoItem(icon = Icons.Outlined.Info, text = user.address.city)
+                            }
+                            DetailSection(title = "Empresa") {
+                                InfoItem(icon = Icons.Outlined.Info, text = user.company.name)
+                                InfoItem(
+                                    icon = Icons.Outlined.Info,
+                                    text = user.company.catchPhrase
+                                )
+                            }
+
+                        }
+                    }
                 }
             }
         }
@@ -86,7 +128,7 @@ fun DetailsScreen(
 fun DetailsScreenPreview() {
     DetailsScreen(
         modifier = Modifier.fillMaxWidth(),
-        user = User(
+        state = UiState(ResultWrapper.Success(User(
             id = 1,
             name = "João Silva",
             username = "joaosilva",
@@ -108,7 +150,7 @@ fun DetailsScreenPreview() {
                 catchPhrase = "Negócios que transformam",
                 bs = "tecnologia, inovação, parceria"
             )
-        )
+        )))
     )
 
 }
