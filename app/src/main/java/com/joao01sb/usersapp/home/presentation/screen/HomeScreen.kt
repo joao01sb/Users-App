@@ -6,6 +6,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -40,9 +41,15 @@ fun HomeScreen(
         modifier = modifier
     ) {
         if (uiState.isLoading) {
-            CircularProgressIndicator()
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.CenterHorizontally)
+            ) {
+                CircularProgressIndicator()
+            }
         } else if (uiState.isErro?.first == true) {
-            Retry(message = uiState.isErro.second, onClick = onRetry)
+            Retry(modifier = modifier.fillMaxSize(), message = uiState.isErro.second, onClick = onRetry)
         } else {
             Text("All users", fontWeight = FontWeight.W600)
             LazyColumn(modifier = Modifier.weight(1f)) {

@@ -3,7 +3,8 @@ package com.joao01sb.usersapp.details.presentation.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.joao01sb.usersapp.core.domain.model.User
+import androidx.navigation.toRoute
+import com.joao01sb.usersapp.ui.navigation.destinations.DetailsScreen
 import com.joao01sb.usersapp.core.utils.ResultWrapper
 import com.joao01sb.usersapp.details.domain.usecase.GetUserById
 import com.joao01sb.usersapp.details.presentation.state.UiState
@@ -13,26 +14,23 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DetailsViewModel(
+    savedStateHandle: SavedStateHandle,
     private val getUserById: GetUserById,
-    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val userId: Int = checkNotNull(savedStateHandle.get<Int>("userId"))
+    private val detailsNav = savedStateHandle.toRoute<DetailsScreen>()
 
     private val _stateDetails = MutableStateFlow<UiState>(UiState())
     val stateDetails = _stateDetails.asStateFlow()
 
 
-    init {
-        getUser()
-    }
 
     fun getUser() {
         _stateDetails.update {
             it.copy(result = ResultWrapper.Loading)
         }
         viewModelScope.launch {
-            getUserById(userId).onSuccess { user ->
+            getUserById(detailsNav.id).onSuccess { user ->
                 _stateDetails.update {
                     it.copy(result = ResultWrapper.Success(user))
                 }

@@ -1,5 +1,6 @@
 package com.joao01sb.usersapp.details.di
 
+import androidx.lifecycle.SavedStateHandle
 import com.joao01sb.usersapp.core.data.local.dao.UserDao
 import com.joao01sb.usersapp.details.data.datasource.LocalDataSourceImp
 import com.joao01sb.usersapp.details.data.repository.UserDetailsRepositoryImp
@@ -23,7 +24,7 @@ val detailsModule = module {
         GetUserByIdImp(repository = get<UserDetailsRepository>())
     }
     viewModel {
-        DetailsViewModel(getUserById = get<GetUserById>(), savedStateHandle = get())
+        DetailsViewModel(getUserById = get<GetUserById>(), savedStateHandle = get<SavedStateHandle>())
     }
 
 }

@@ -13,7 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.joao01sb.usersapp.core.navigation.NavApp
+import com.joao01sb.usersapp.ui.navigation.NavApp
 import com.joao01sb.usersapp.core.utils.UiEvent
 import com.joao01sb.usersapp.home.presentation.viewmodel.HomeViewModel
 import com.joao01sb.usersapp.ui.theme.UsersAppTheme
@@ -45,8 +45,7 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavApp(
                         modifier = Modifier.padding(innerPadding),
-                        navController = rememberNavContoller,
-                        viewModel = viewModel
+                        navController = rememberNavContoller
                     )
                 }
             }

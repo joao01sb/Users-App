@@ -1,18 +1,13 @@
 package com.joao01sb.usersapp.details.presentation.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LocationOn
@@ -28,12 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.joao01sb.usersapp.core.domain.model.Address
 import com.joao01sb.usersapp.core.domain.model.Company
 import com.joao01sb.usersapp.core.domain.model.Geo
 import com.joao01sb.usersapp.core.domain.model.User
-import com.joao01sb.usersapp.core.presentation.components.UserAvatar
 import com.joao01sb.usersapp.core.utils.ResultWrapper
 import com.joao01sb.usersapp.details.presentation.components.DetailSection
 import com.joao01sb.usersapp.details.presentation.components.InfoItem
@@ -41,7 +34,7 @@ import com.joao01sb.usersapp.details.presentation.components.UserDetailHeader
 import com.joao01sb.usersapp.details.presentation.state.UiState
 
 @Composable
-fun DetailsScreen(
+fun DetailsUserScreen(
     modifier: Modifier = Modifier,
     state: UiState = UiState(),
     onBack: () -> Unit = {}
@@ -126,7 +119,7 @@ fun DetailsScreen(
 @Preview
 @Composable
 fun DetailsScreenPreview() {
-    DetailsScreen(
+    DetailsUserScreen(
         modifier = Modifier.fillMaxWidth(),
         state = UiState(ResultWrapper.Success(User(
             id = 1,
