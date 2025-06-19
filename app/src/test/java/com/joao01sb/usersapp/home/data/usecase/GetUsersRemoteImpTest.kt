@@ -4,10 +4,9 @@ import app.cash.turbine.test
 import com.joao01sb.usersapp.MockUserFactory
 import com.joao01sb.usersapp.MockUserFactory.toModelForDto
 import com.joao01sb.usersapp.core.data.remote.dto.UserDto
-import com.joao01sb.usersapp.core.domain.mapper.toModel
 import com.joao01sb.usersapp.core.utils.ResultWrapper
 import com.joao01sb.usersapp.home.domain.repository.UserRemoteRepository
-import com.joao01sb.usersapp.home.domain.usecase.GetUsersRemoteUseCase
+import com.joao01sb.usersapp.home.domain.usecase.GetUsersRemote
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
@@ -17,15 +16,15 @@ import org.junit.Before
 import org.junit.Test
 
 
-class GetUsersRemoteUseCaseImpTest {
+class GetUsersRemoteImpTest {
 
     lateinit var repository: UserRemoteRepository
-    lateinit var useCase: GetUsersRemoteUseCase
+    lateinit var useCase: GetUsersRemote
 
     @Before
     fun setup() {
         repository = mockk<UserRemoteRepository>(relaxed = true)
-        useCase = GetUsersRemoteUseCaseImp(repository)
+        useCase = GetUsersRemoteImp(repository)
     }
 
     @Test

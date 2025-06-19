@@ -3,13 +3,13 @@ package com.joao01sb.usersapp.home.data.usecase
 import com.joao01sb.usersapp.core.domain.mapper.toModel
 import com.joao01sb.usersapp.core.domain.model.User
 import com.joao01sb.usersapp.home.domain.repository.UserLocalRepository
-import com.joao01sb.usersapp.home.domain.usecase.GetUsersLocalUseCase
+import com.joao01sb.usersapp.home.domain.usecase.GetUsersLocal
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class GetUsersLocalUseCaseImp(
+class GetUsersLocalImp(
     private val userLocalRepository: UserLocalRepository
-) : GetUsersLocalUseCase{
+) : GetUsersLocal{
 
     override suspend fun invoke(): Flow<List<User>> {
         return userLocalRepository.getUsersLocal()

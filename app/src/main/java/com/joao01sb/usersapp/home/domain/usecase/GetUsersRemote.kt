@@ -4,7 +4,7 @@ import com.joao01sb.usersapp.core.domain.model.User
 import com.joao01sb.usersapp.core.utils.ResultWrapper
 import kotlinx.coroutines.flow.Flow
 
-interface GetUsersRemoteUseCase {
+interface GetUsersRemote {
 
     suspend fun invoke() : Flow<ResultWrapper<List<User>>>
 

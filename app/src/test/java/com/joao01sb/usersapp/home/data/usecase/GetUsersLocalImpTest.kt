@@ -4,7 +4,7 @@ import com.joao01sb.usersapp.MockUserFactory
 import com.joao01sb.usersapp.MockUserFactory.toModelForEntenty
 import com.joao01sb.usersapp.core.data.local.entities.UserEntity
 import com.joao01sb.usersapp.home.domain.repository.UserLocalRepository
-import com.joao01sb.usersapp.home.domain.usecase.GetUsersLocalUseCase
+import com.joao01sb.usersapp.home.domain.usecase.GetUsersLocal
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
@@ -17,15 +17,15 @@ import java.sql.SQLDataException
 import kotlin.test.assertFailsWith
 
 
-class GetUsersLocalUseCaseImpTest {
+class GetUsersLocalImpTest {
 
     lateinit var repository: UserLocalRepository
-    lateinit var useCase: GetUsersLocalUseCase
+    lateinit var useCase: GetUsersLocal
 
     @Before
     fun setup() {
         repository = mockk<UserLocalRepository>(relaxed = true)
-        useCase = GetUsersLocalUseCaseImp(repository)
+        useCase = GetUsersLocalImp(repository)
     }
 
     @Test
