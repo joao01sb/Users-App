@@ -1,5 +1,6 @@
 package com.joao01sb.usersapp.ui.navigation
 
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -8,6 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.joao01sb.usersapp.core.utils.UiEvent
 import com.joao01sb.usersapp.ui.navigation.destinations.DetailsScreen
 import com.joao01sb.usersapp.ui.navigation.destinations.HomeScreen
 import com.joao01sb.usersapp.details.presentation.screen.DetailsUserScreen
@@ -27,11 +29,24 @@ fun NavApp(
         startDestination = HomeScreen()
     ) {
         composable<HomeScreen> {
-            val viewModel: HomeViewModel = org.koin.androidx.compose.koinViewModel()
+            val viewModel: HomeViewModel = koinViewModel()
             val state by viewModel.uiState.collectAsStateWithLifecycle()
+            LaunchedEffect(Unit) {
+                viewModel.uiEvents.collect { event ->
+                    when (event) {
+                        is UiEvent.ShowToast -> {
+                            Toast.makeText(
+                                navController.context,
+                                event.message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
             HomeScreen(
                 uiState = state,
-                onRetry = viewModel::refreshData,
+                onRetry = viewModel::refresh,
                 onClickUser = { id ->
                     navController.navigate(DetailsScreen(id))
                 }
