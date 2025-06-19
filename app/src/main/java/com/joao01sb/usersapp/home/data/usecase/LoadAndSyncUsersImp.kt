@@ -8,6 +8,7 @@ import com.joao01sb.usersapp.home.domain.usecase.LoadAndSyncUsers
 import com.joao01sb.usersapp.home.domain.usecase.SaveUsers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -27,6 +28,8 @@ class LoadAndSyncUsersImp(
                 } else {
                     syncUsers()
                 }
+            }.catch { e ->
+                emit(ResultWrapper.Error(e))
             }
     }
 

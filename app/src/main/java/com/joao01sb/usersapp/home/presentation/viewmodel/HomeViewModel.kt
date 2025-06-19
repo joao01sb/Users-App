@@ -41,7 +41,10 @@ class HomeViewModel(
                 handleResult(it)
             }
         }
+        syncUsers()
+    }
 
+    fun syncUsers() {
         remoteFetchJob?.cancel()
         remoteFetchJob = viewModelScope.launch {
             scheduleRemoteSync.execute(60000L).collect {
@@ -60,12 +63,12 @@ class HomeViewModel(
                 }
             }
         }
-
     }
 
     fun refresh() {
         remoteFetchJob?.cancel()
         viewModelScope.launch {
+            _uiState.value = UiState(isLoading = true)
             loadAndSyncUsers.syncUsers().collect {
                 handleResult(it)
             }
@@ -75,9 +78,7 @@ class HomeViewModel(
     private fun handleResult(result: ResultWrapper<List<User>>) {
         when (result) {
             is ResultWrapper.Success -> _uiState.value = UiState(users = result.result)
-            is ResultWrapper.Error -> _uiState.value =
-                UiState(isErro = Pair(true, result.error.message ?: "Erro"))
-
+            is ResultWrapper.Error -> _uiState.value = UiState(isErro = Pair(true, result.error.message ?: "Erro"))
             is ResultWrapper.Loading -> _uiState.value = UiState(isLoading = true)
         }
     }

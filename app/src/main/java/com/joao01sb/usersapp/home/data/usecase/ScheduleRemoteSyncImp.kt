@@ -14,7 +14,6 @@ class ScheduleRemoteSyncImp(
     private val loadAndSyncUsers: LoadAndSyncUsers
 )  : ScheduleRemoteSync {
     override fun execute(delayMillis: Long): Flow<ResultWrapper<List<User>>> = flow{
-        Log.d("ScheduleRemoteSyncImp", "execute: ")
         delay(delayMillis)
         emitAll(loadAndSyncUsers.syncUsers())
     }
