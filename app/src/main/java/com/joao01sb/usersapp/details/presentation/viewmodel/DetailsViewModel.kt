@@ -19,11 +19,8 @@ class DetailsViewModel(
 ) : ViewModel() {
 
     private val detailsNav = savedStateHandle.toRoute<DetailsScreen>()
-
     private val _stateDetails = MutableStateFlow<UiState>(UiState())
     val stateDetails = _stateDetails.asStateFlow()
-
-
 
     fun getUser() {
         _stateDetails.update {
