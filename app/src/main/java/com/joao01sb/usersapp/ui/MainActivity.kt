@@ -1,4 +1,4 @@
-package com.joao01sb.usersapp
+package com.joao01sb.usersapp.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -18,10 +18,10 @@ class MainActivity : ComponentActivity() {
             UsersAppTheme {
                 val rememberNavContoller = rememberNavController()
                 Scaffold(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.Companion.fillMaxSize()
                 ) { innerPadding ->
                     NavApp(
-                        modifier = Modifier.padding(innerPadding),
+                        modifier = Modifier.Companion.padding(innerPadding),
                         navController = rememberNavContoller
                     )
                 }
