@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,13 +46,21 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .align(Alignment.CenterHorizontally)
+                    .testTag("progress_indicator")
             ) {
                 CircularProgressIndicator()
             }
         } else if (uiState.isErro?.first == true) {
-            Retry(modifier = modifier.fillMaxSize(), message = uiState.isErro.second, onClick = onRetry)
+            Retry(
+                modifier = modifier.fillMaxSize(),
+                message = uiState.isErro.second,
+                onClick = onRetry
+            )
         } else {
-            Text("All users", fontWeight = FontWeight.W600)
+            Text(
+                "All users", fontWeight = FontWeight.W600, modifier = Modifier
+                    .testTag("homescreen_title")
+            )
             LazyColumn(modifier = Modifier.weight(1f)) {
                 items(uiState.users) {
                     UserComp(

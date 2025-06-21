@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -24,6 +26,8 @@ fun Retry(
     ) {
         Text(message, color = Color.Green)
         TextButton(
+            modifier = Modifier
+                .testTag("retry_button"),
             onClick = onClick, border =
                 BorderStroke(0.5.dp, color = Color.Green)
         ) {
