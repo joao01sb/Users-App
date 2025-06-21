@@ -2,8 +2,50 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("com.google.devtools.ksp") version "2.1.20-2.0.1"
-    kotlin("plugin.serialization") version "1.9.0" // Use the latest version
+    id("com.google.devtools.ksp") version "2.1.21-2.0.1"
+    kotlin("plugin.serialization") version "1.9.0" 
+    alias(libs.plugins.kotlinx.kover)
+}
+
+kover {
+    reports {
+        total {
+            xml {
+                onCheck = true
+            }
+            html {
+                onCheck = true
+            }
+        }
+
+        verify {
+            rule {
+                bound {
+                    minValue = 50
+//                    counter = "LINE"
+//                    valueType = "COVERED_PERCENTAGE"
+                }
+            }
+        }
+
+        filters {
+            excludes {
+                annotatedBy(
+                    "androidx.compose.runtime.Composable",
+                    "androidx.compose.ui.tooling.preview.Preview"
+                )
+
+                packages(
+                    "com.joao01sb.usersapp.ui.theme",
+                    "com.joao01sb.usersapp.ui.navigation",
+                    "com.joao01sb.usersapp.*.di",
+                    "com.joao01sb.usersapp.core.utils",
+                    "com.joao01sb.usersapp.core.domain",
+                    "com.joao01sb.usersapp.core.data.*",
+                )
+            }
+        }
+    }
 }
 
 android {
