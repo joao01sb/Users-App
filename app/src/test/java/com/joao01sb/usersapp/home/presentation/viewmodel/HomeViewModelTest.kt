@@ -15,17 +15,15 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
+import io.mockk.clearAllMocks
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.runTest
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import kotlinx.coroutines.test.*
+import org.junit.*
+import org.junit.Assert.*
 
+@ExperimentalCoroutinesApi
 class HomeViewModelTest {
 
     @get:Rule
@@ -34,13 +32,17 @@ class HomeViewModelTest {
     private lateinit var viewModel: HomeViewModel
     private lateinit var loadAndSyncUsers: LoadAndSyncUsers
     private lateinit var scheduleRemoteSync: ScheduleRemoteSync
+    private val testDispatcher = StandardTestDispatcher()
 
     @Before
     fun setup() {
+        Dispatchers.setMain(testDispatcher)
+
         mockkStatic(Log::class)
         every { Log.d(any(), any()) } returns 0
         every { Log.e(any(), any()) } returns 0
         every { Log.e(any(), any<String>(), any()) } returns 0
+
         scheduleRemoteSync = mockk(relaxed = true)
         loadAndSyncUsers = mockk(relaxed = true)
         viewModel = HomeViewModel(loadAndSyncUsers, scheduleRemoteSync)
@@ -48,320 +50,193 @@ class HomeViewModelTest {
 
     @After
     fun tearDown() {
+        testDispatcher.scheduler.advanceUntilIdle()
+        Dispatchers.resetMain()
+        clearAllMocks()
         unmockkStatic(Log::class)
     }
 
     @Test
-    fun `given loadAndSyncUsers returns success, when loadUsers is called, then uiState is updated with users`() =
-        runTest {
+    fun `loadUsers should update uiState with users when use case returns success`() =
+        runTest(testDispatcher) {
             val users = MockUserFactory.createUserListEntity().toModelForEntenty()
-
             coEvery { loadAndSyncUsers.invoke() } returns flowOf(ResultWrapper.Success(users))
 
             viewModel.loadUsers()
+            advanceUntilIdle()
 
-            coVerify { loadAndSyncUsers.invoke() }
+            coVerify(exactly = 2) { loadAndSyncUsers.invoke() }
 
             viewModel.uiState.test {
                 val item = awaitItem()
-
-                assertEquals(item.users, users)
-
+                assertEquals(users, item.users)
+                assertFalse(item.isLoading)
                 cancelAndConsumeRemainingEvents()
             }
         }
 
     @Test
-    fun `given loadAndSyncUsers returns error, when loadUsers is called, then uiState is updated with error message`() =
-        runTest {
+    fun `loadUsers should update uiState with error when use case returns error`() =
+        runTest(testDispatcher) {
             val errorMessage = "test error"
             val error = Exception(errorMessage)
-
             coEvery { loadAndSyncUsers.invoke() } returns flowOf(ResultWrapper.Error(error))
 
             viewModel.loadUsers()
-
-            coVerify { loadAndSyncUsers.invoke() }
+            advanceUntilIdle()
 
             viewModel.uiState.test {
                 val item = awaitItem()
 
+                assertNotNull(item.isErro)
                 assertTrue(item.isErro?.first == true)
-
-                assertEquals(item.isErro?.second, errorMessage)
+                assertEquals(errorMessage, item.isErro?.second)
+                assertFalse(item.isLoading)
 
                 cancelAndConsumeRemainingEvents()
             }
+
+            coVerify(exactly = 2) { loadAndSyncUsers.invoke() }
         }
 
     @Test
-    fun `given loadAndSyncUsers returns loading, when loadUsers is called, then uiState is updated with loading state`() =
-        runTest {
+    fun `loadUsers should show loading state when use case returns loading`() =
+        runTest(testDispatcher) {
             coEvery { loadAndSyncUsers.invoke() } returns flowOf(ResultWrapper.Loading)
 
             viewModel.loadUsers()
-
-            coVerify { loadAndSyncUsers.invoke() }
+            advanceUntilIdle()
 
             viewModel.uiState.test {
                 val item = awaitItem()
-
                 assertTrue(item.isLoading)
-
+                assertTrue(item.users.isEmpty())
                 cancelAndConsumeRemainingEvents()
             }
+
+            coVerify(exactly = 2) { loadAndSyncUsers.invoke() }
         }
 
     @Test
-    fun `when refresh is called, then loadAndSyncUsers is called`() = runTest {
-        viewModel.refresh()
-
-        coVerify { loadAndSyncUsers.syncUsers() }
-
-        viewModel.uiState.test {
-            val item = awaitItem()
-
-            assertTrue(item.isLoading)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-
-    @Test
-    fun `when refresh is called and loadAndSyncUsers returns success, then uiState is updated`() =
-        runTest {
-            val users = MockUserFactory.createUserListEntity().toModelForEntenty()
-
-            coEvery { loadAndSyncUsers.syncUsers() } returns flowOf(ResultWrapper.Success(users))
-
-            viewModel.refresh()
-
-            viewModel.uiState.test {
-                val item = awaitItem()
-
-                assertEquals(item.users, users)
-
-                cancelAndConsumeRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `when refresh is called and loadAndSyncUsers returns error, then uiState is updated`() =
-        runTest {
-            val errorMessage = "test error"
-            val error = Exception(errorMessage)
-
-            coEvery { loadAndSyncUsers.syncUsers() } returns flowOf(ResultWrapper.Error(error))
-
-            viewModel.refresh()
-
-            viewModel.uiState.test {
-                val item = awaitItem()
-
-                assertTrue(item.isErro?.first == true)
-
-                assertEquals(item.isErro?.second, errorMessage)
-
-                cancelAndConsumeRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `when refresh is called and loadAndSyncUsers returns loading, then uiState is updated`() =
-        runTest {
+    fun `refresh should call syncUsers and show loading state`() =
+        runTest(testDispatcher) {
             coEvery { loadAndSyncUsers.syncUsers() } returns flowOf(ResultWrapper.Loading)
 
             viewModel.refresh()
+            advanceUntilIdle()
 
             viewModel.uiState.test {
                 val item = awaitItem()
-
                 assertTrue(item.isLoading)
 
                 cancelAndConsumeRemainingEvents()
             }
+
+            coVerify(exactly = 1) { loadAndSyncUsers.syncUsers() }
         }
 
     @Test
-    fun `when invoke success, then uiEvents is updated`() = runTest {
-        val duration = 60000L
-        val users = MockUserFactory.createUserListEntity().toModelForEntenty()
+    fun `refresh should update uiState with users when syncUsers returns success`() =
+        runTest(testDispatcher) {
+            val users = MockUserFactory.createUserListEntity().toModelForEntenty()
+            coEvery { loadAndSyncUsers.syncUsers() } returns flowOf(ResultWrapper.Success(users))
 
-        coEvery { scheduleRemoteSync.execute(duration) } returns flowOf(ResultWrapper.Success(users))
+            viewModel.refresh()
+            advanceUntilIdle()
 
-        viewModel.syncUsers()
+            viewModel.uiState.test {
+                val item = awaitItem()
+                assertEquals(users, item.users)
+                assertFalse(item.isLoading)
+                cancelAndConsumeRemainingEvents()
+            }
 
-        advanceTimeBy(duration)
-
-        viewModel.uiEvents.test {
-            val item = awaitItem()
-
-            assertTrue(item is UiEvent.ShowToast)
-
-            cancelAndConsumeRemainingEvents()
+            coVerify(exactly = 1) { loadAndSyncUsers.syncUsers() }
         }
 
-    }
-
-
     @Test
-    fun `when loadUsers is called and loadAndSyncUsers returns error, then uiEvents is updated`() = runTest {
-        val errorMessage = "test error"
-        val error = Exception(errorMessage)
+    fun `refresh should update uiState with error when syncUsers returns error`() =
+        runTest(testDispatcher) {
+            val errorMessage = "test error"
+            val error = Exception(errorMessage)
+            coEvery { loadAndSyncUsers.syncUsers() } returns flowOf(ResultWrapper.Error(error))
 
-        coEvery { loadAndSyncUsers.invoke() } returns flowOf(ResultWrapper.Error(error))
+            viewModel.refresh()
+            advanceUntilIdle()
 
-       viewModel.uiState.test {
-           viewModel.loadUsers()
+            viewModel.uiState.test {
+                val item = awaitItem()
 
-           assert(awaitItem().users.isEmpty())
+                assertNotNull(item.isErro)
+                assertTrue(item.isErro?.first == true)
+                assertEquals(errorMessage, item.isErro?.second)
+                assertFalse(item.isLoading)
 
-           val item = awaitItem()
+                cancelAndConsumeRemainingEvents()
+            }
 
-           assertTrue(item.isErro?.first == true)
-
-           cancelAndConsumeRemainingEvents()
-       }
-
-    }
-
-    @Test
-    fun `when loadUsers is called and loadAndSyncUsers returns loading, then uiEvents is updated`() = runTest {
-        coEvery { loadAndSyncUsers.invoke() } returns flowOf(ResultWrapper.Loading)
-
-        viewModel.loadUsers()
-
-        viewModel.uiState.test {
-            val item = awaitItem()
-
-            assertTrue(item.isLoading)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `when syncUsers is called and scheduleRemoteSync returns success, then uiEvents is updated`() = runTest {
-        val users = MockUserFactory.createUserListEntity().toModelForEntenty()
-
-        coEvery { loadAndSyncUsers.invoke() } returns flowOf(ResultWrapper.Success(users))
-
-        viewModel.loadUsers()
-
-        viewModel.uiState.test {
-            val item = awaitItem()
-
-            assertEquals(item.users, users)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `when syncUsers is called and scheduleRemoteSync returns error, then uiEvents is updated`() = runTest {
-        val errorMessage = "test error"
-        val error = Exception(errorMessage)
-
-        coEvery { loadAndSyncUsers.invoke() } returns flowOf(ResultWrapper.Error(error))
-
-        viewModel.loadUsers()
-
-        viewModel.uiState.test {
-            val item = awaitItem()
-
-            assertTrue(item.isErro?.first == true)
-
-            cancelAndConsumeRemainingEvents()
+            coVerify(exactly = 1) { loadAndSyncUsers.syncUsers() }
         }
 
-    }
-
     @Test
-    fun `when syncUsers is called and scheduleRemoteSync returns loading, then uiState is updated`() = runTest {
+    fun `refresh should show loading state when syncUsers returns loading`() =
+        runTest(testDispatcher) {
+            coEvery { loadAndSyncUsers.syncUsers() } returns flowOf(ResultWrapper.Loading)
 
-        coEvery { loadAndSyncUsers.invoke() } returns flowOf(ResultWrapper.Loading)
+            viewModel.refresh()
+            advanceUntilIdle()
 
-        viewModel.loadUsers()
+            viewModel.uiState.test {
+                val item = awaitItem()
+                assertTrue(item.isLoading)
 
-        viewModel.uiState.test {
-            val item = awaitItem()
+                cancelAndConsumeRemainingEvents()
+            }
 
-            assertTrue(item.isLoading)
-
-            cancelAndConsumeRemainingEvents()
+            coVerify(exactly = 1) { loadAndSyncUsers.syncUsers() }
         }
 
-    }
+    @Test
+    fun `syncUsers should show success toast when operation succeeds`() =
+        runTest(testDispatcher) {
+            val users = MockUserFactory.createUserListEntity().toModelForEntenty()
+            coEvery { scheduleRemoteSync.execute(60000L) } returns flowOf(ResultWrapper.Success(users))
+
+            viewModel.uiEvents.test {
+                viewModel.syncUsers()
+                advanceTimeBy(60000L)
+
+                val item = awaitItem()
+                assertTrue(item is UiEvent.ShowToast)
+                assertEquals("Users updated", (item as UiEvent.ShowToast).message)
+
+                cancelAndConsumeRemainingEvents()
+            }
+
+            coVerify(exactly = 2) { scheduleRemoteSync.execute(60000L) }
+        }
 
     @Test
-    fun `when syncUsers is called and scheduleRemoteSync returns error then uiState is updated`() = runTest {
-        val errorMessage = "test error"
-        val error = Exception(errorMessage)
+    fun `syncUsers should show error toast when operation fails`() =
+        runTest(testDispatcher) {
+            val errorMessage = "test error"
+            val error = Exception(errorMessage)
+            coEvery { loadAndSyncUsers.invoke() } returns flowOf(ResultWrapper.Success(emptyList()))
+            coEvery { scheduleRemoteSync.execute(any()) } returns flowOf(ResultWrapper.Error(error))
+            coEvery { loadAndSyncUsers.syncUsers() } returns flowOf(ResultWrapper.Success(emptyList()))
 
-        coEvery { loadAndSyncUsers.invoke() } returns flowOf(ResultWrapper.Error(error))
+            viewModel.uiEvents.test {
+                viewModel.syncUsers()
+                advanceTimeBy(60000L)
 
-        viewModel.loadUsers()
+                val item = awaitItem()
 
-        viewModel.uiState.test {
-            val item = awaitItem()
+                assertTrue(item is UiEvent.ShowToast)
+                assertEquals(errorMessage, (item as UiEvent.ShowToast).message)
 
-            assertTrue(item.isErro?.first == true)
+                cancelAndConsumeRemainingEvents()
+            }
 
-            cancelAndConsumeRemainingEvents()
+            coVerify(exactly = 2) { scheduleRemoteSync.execute(60000L) }
         }
-    }
-
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `when syncUser is called and scheduleRemoteSync returns error then uiEvents is update toast`() = runTest {
-        val errorMessage = "test error"
-        val error = Exception(errorMessage)
-
-        coEvery { loadAndSyncUsers.invoke() } returns flowOf(ResultWrapper.Success(emptyList()))
-
-        coEvery { scheduleRemoteSync.execute(any()) } returns flowOf(ResultWrapper.Error(error))
-
-        coEvery { loadAndSyncUsers.syncUsers() } returns flowOf(ResultWrapper.Success(emptyList()))
-
-        viewModel.uiEvents.test {
-            viewModel.syncUsers()
-
-            advanceTimeBy(60000L)
-
-            val item = awaitItem()
-
-            assertTrue(item is UiEvent.ShowToast)
-            assertEquals(errorMessage, (item as UiEvent.ShowToast).message)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `when syncUser is called and scheduleRemoteSync returns success then uiEvents is update toast`() = runTest {
-        val users = MockUserFactory.createUserListEntity().toModelForEntenty()
-
-        coEvery { loadAndSyncUsers.invoke() } returns flowOf(ResultWrapper.Success(emptyList()))
-
-        coEvery { scheduleRemoteSync.execute(any()) } returns flowOf(ResultWrapper.Success(users))
-
-        viewModel.uiEvents.test {
-            viewModel.syncUsers()
-
-            advanceTimeBy(60000L)
-
-            val item = awaitItem()
-
-            assertTrue(item is UiEvent.ShowToast)
-
-            assertEquals("Users updated", (item as UiEvent.ShowToast).message)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-
 }

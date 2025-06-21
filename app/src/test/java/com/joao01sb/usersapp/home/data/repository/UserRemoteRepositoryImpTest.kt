@@ -35,6 +35,7 @@ class UserRemoteRepositoryImpTest {
 
         repository.getUsersRemote().test {
             assertEquals(awaitItem(), result)
+            awaitComplete()
         }
     }
 
