@@ -23,8 +23,9 @@ val detailsModule = module {
     single<GetUserById> {
         GetUserByIdImp(repository = get<UserDetailsRepository>())
     }
-    viewModel {
-        DetailsViewModel(getUserById = get<GetUserById>(), savedStateHandle = get<SavedStateHandle>())
+    viewModel { (savedStateHandle: SavedStateHandle) ->
+        val id = savedStateHandle.get<Int>("id") ?: error("userId is missing")
+        DetailsViewModel(getUserById = get<GetUserById>(), userId = id)
     }
 
 }

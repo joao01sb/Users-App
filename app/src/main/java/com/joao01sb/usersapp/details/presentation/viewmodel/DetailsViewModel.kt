@@ -14,11 +14,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DetailsViewModel(
-    savedStateHandle: SavedStateHandle,
+    val userId: Int,
     private val getUserById: GetUserById,
 ) : ViewModel() {
 
-    private val detailsNav = savedStateHandle.toRoute<DetailsScreen>()
     private val _stateDetails = MutableStateFlow<UiState>(UiState())
     val stateDetails = _stateDetails.asStateFlow()
 
@@ -27,7 +26,7 @@ class DetailsViewModel(
             it.copy(result = ResultWrapper.Loading)
         }
         viewModelScope.launch {
-            getUserById(detailsNav.id).onSuccess { user ->
+            getUserById(userId).onSuccess { user ->
                 _stateDetails.update {
                     it.copy(result = ResultWrapper.Success(user))
                 }
