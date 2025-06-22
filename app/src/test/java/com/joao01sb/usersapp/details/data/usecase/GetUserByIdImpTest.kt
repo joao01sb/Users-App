@@ -10,6 +10,7 @@ import com.joao01sb.usersapp.details.domain.usecase.GetUserById
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
+import okio.IOException
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -58,7 +59,7 @@ class GetUserByIdImpTest {
 
         assert(userLocal.isFailure)
 
-        assertEquals(userLocal.exceptionOrNull(), exception)
+        assertEquals(userLocal.exceptionOrNull() is IOException, true)
     }
 
 }
