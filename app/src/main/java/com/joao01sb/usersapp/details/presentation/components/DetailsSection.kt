@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.joao01sb.usersapp.ui.theme.BlackColor
 
 @Composable
 fun DetailSection(
@@ -23,7 +24,7 @@ fun DetailSection(
             text = title,
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF212121),
+            color = BlackColor,
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
