@@ -26,6 +26,8 @@ turbine = "1.2.1"
 navigationCompose = "2.9.0"
 serialization = "1.8.1"
 kotlinxKover = "0.9.1"
+detekt = "1.23.8"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -67,5 +69,6 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinx-kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kotlinxKover" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 
 
