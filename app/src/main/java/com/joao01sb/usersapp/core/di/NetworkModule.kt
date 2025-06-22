@@ -1,6 +1,8 @@
 package com.joao01sb.usersapp.core.di
 
 import com.joao01sb.usersapp.core.data.remote.ApiService
+import com.joao01sb.usersapp.core.utils.BASE_URL
+import com.joao01sb.usersapp.core.utils.TIMEOUT_REQUEST
 import okhttp3.OkHttpClient
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -12,16 +14,16 @@ val networkModule = module {
     single {
         providerRetrofit<ApiService>(
             okHttpClient = get(),
-            url = "https://jsonplaceholder.typicode.com"
+            url = BASE_URL
         )
     }
 }
 
 fun providerOkHttpClient(): OkHttpClient =
     OkHttpClient.Builder()
-        .callTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(10, TimeUnit.SECONDS)
-        .writeTimeout(10, TimeUnit.SECONDS)
+        .callTimeout(TIMEOUT_REQUEST, TimeUnit.SECONDS)
+        .readTimeout(TIMEOUT_REQUEST, TimeUnit.SECONDS)
+        .writeTimeout(TIMEOUT_REQUEST, TimeUnit.SECONDS)
         .build()
 
 

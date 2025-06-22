@@ -17,5 +17,4 @@ class UserLocalRepositoryImp(
         dataSource.insertUser(users)
     }
 
-
 }

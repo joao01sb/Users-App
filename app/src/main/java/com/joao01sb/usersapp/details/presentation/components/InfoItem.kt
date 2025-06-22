@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.joao01sb.usersapp.ui.theme.GrayBlackColor
 
 @Composable
 fun InfoItem(
@@ -40,7 +41,7 @@ fun InfoItem(
         Text(
             text = text,
             fontSize = 16.sp,
-            color = Color(0xFF424242),
+            color = GrayBlackColor,
             lineHeight = 22.sp
         )
     }

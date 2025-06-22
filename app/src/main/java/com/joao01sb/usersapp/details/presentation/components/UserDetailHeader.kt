@@ -13,6 +13,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.joao01sb.usersapp.core.domain.model.User
 import com.joao01sb.usersapp.core.presentation.components.UserAvatar
+import com.joao01sb.usersapp.ui.theme.BlackColor
+import com.joao01sb.usersapp.ui.theme.GrayMediumColor
 
 @Composable
 fun UserDetailHeader(user: User) {
@@ -31,7 +33,7 @@ fun UserDetailHeader(user: User) {
             text = user.name,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF212121)
+            color = BlackColor
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -39,7 +41,7 @@ fun UserDetailHeader(user: User) {
         Text(
             text = "@${user.username}",
             fontSize = 16.sp,
-            color = Color(0xFF757575)
+            color = GrayMediumColor
         )
     }
 }

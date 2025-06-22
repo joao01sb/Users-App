@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.joao01sb.usersapp.core.domain.model.User
 import com.joao01sb.usersapp.core.utils.ResultWrapper
+import com.joao01sb.usersapp.core.utils.TIME_FOR_SYNC_USERS
 import com.joao01sb.usersapp.core.utils.UiEvent
 import com.joao01sb.usersapp.home.domain.usecase.LoadAndSyncUsers
 import com.joao01sb.usersapp.home.domain.usecase.ScheduleRemoteSync
@@ -47,7 +48,7 @@ class HomeViewModel(
     fun syncUsers() {
         remoteFetchJob?.cancel()
         remoteFetchJob = viewModelScope.launch {
-            scheduleRemoteSync.execute(60000L).collect {
+            scheduleRemoteSync.execute(TIME_FOR_SYNC_USERS).collect {
                 when (it) {
                     is ResultWrapper.Error -> _uiEvents.emit(
                         UiEvent.ShowToast(

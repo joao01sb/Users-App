@@ -35,7 +35,8 @@ class LoadAndSyncUsersImpTest {
 
     @Test
     fun `verify that invoke calls getLocalUsers`() = runTest {
-        coEvery { getLocalUsers.invoke() } returns flowOf(MockUserFactory.createUserListEntity().toModelForEntenty())
+        coEvery { getLocalUsers.invoke() } returns
+                flowOf(MockUserFactory.createUserListEntity().toModelForEntenty())
 
         loadAndSyncUsers.invoke().first()
 
@@ -46,7 +47,8 @@ class LoadAndSyncUsersImpTest {
     fun `verify that invoke calls getRemoteUsers given getLocalUsers returns empty list`()  = runTest{
         coEvery { getLocalUsers.invoke() } returns flowOf(emptyList())
 
-        coEvery { getRemoteUsers.invoke() } returns flowOf(ResultWrapper.Success(MockUserFactory.createUserListDto().toModelForDto()))
+        coEvery { getRemoteUsers.invoke() } returns
+                flowOf(ResultWrapper.Success(MockUserFactory.createUserListDto().toModelForDto()))
 
         loadAndSyncUsers.invoke().first()
 
@@ -57,7 +59,8 @@ class LoadAndSyncUsersImpTest {
     fun `given getRemoteUsers returns success, verify that invoke returns success`() = runTest {
         coEvery { getLocalUsers.invoke() } returns flowOf(emptyList())
 
-        coEvery { getRemoteUsers.invoke() } returns flowOf(ResultWrapper.Success(MockUserFactory.createUserListDto().toModelForDto()))
+        coEvery { getRemoteUsers.invoke() } returns
+                flowOf(ResultWrapper.Success(MockUserFactory.createUserListDto().toModelForDto()))
 
         coEvery { saveUsers.invoke(any()) } returns Unit
 
@@ -74,7 +77,8 @@ class LoadAndSyncUsersImpTest {
     fun `given getRemoteUsers returns success, verify that invoke calls saveUsers`() = runTest {
         coEvery { getLocalUsers.invoke() } returns flowOf(emptyList())
 
-        coEvery { getRemoteUsers.invoke() } returns flowOf(ResultWrapper.Success(MockUserFactory.createUserListDto().toModelForDto()))
+        coEvery { getRemoteUsers.invoke() } returns
+                flowOf(ResultWrapper.Success(MockUserFactory.createUserListDto().toModelForDto()))
 
         coEvery { saveUsers.invoke(any()) } returns Unit
 
@@ -104,7 +108,8 @@ class LoadAndSyncUsersImpTest {
 
     @Test
     fun `given syncUsers returns success, verify that invoke returns success`() = runTest {
-        coEvery { getRemoteUsers.invoke() } returns flowOf(ResultWrapper.Success(MockUserFactory.createUserListDto().toModelForDto()))
+        coEvery { getRemoteUsers.invoke() } returns
+                flowOf(ResultWrapper.Success(MockUserFactory.createUserListDto().toModelForDto()))
 
         coEvery { saveUsers.invoke(any()) } returns Unit
 

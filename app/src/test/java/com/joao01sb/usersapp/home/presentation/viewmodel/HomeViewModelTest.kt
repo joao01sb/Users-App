@@ -6,6 +6,7 @@ import app.cash.turbine.test
 import com.joao01sb.usersapp.MockUserFactory
 import com.joao01sb.usersapp.MockUserFactory.toModelForEntenty
 import com.joao01sb.usersapp.core.utils.ResultWrapper
+import com.joao01sb.usersapp.core.utils.TIME_FOR_SYNC_USERS
 import com.joao01sb.usersapp.core.utils.UiEvent
 import com.joao01sb.usersapp.home.domain.usecase.LoadAndSyncUsers
 import com.joao01sb.usersapp.home.domain.usecase.ScheduleRemoteSync
@@ -19,9 +20,20 @@ import io.mockk.clearAllMocks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.*
-import org.junit.*
-import org.junit.Assert.*
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 
 @ExperimentalCoroutinesApi
 class HomeViewModelTest {
@@ -200,11 +212,11 @@ class HomeViewModelTest {
     fun `syncUsers should show success toast when operation succeeds`() =
         runTest(testDispatcher) {
             val users = MockUserFactory.createUserListEntity().toModelForEntenty()
-            coEvery { scheduleRemoteSync.execute(60000L) } returns flowOf(ResultWrapper.Success(users))
+            coEvery { scheduleRemoteSync.execute(TIME_FOR_SYNC_USERS) } returns flowOf(ResultWrapper.Success(users))
 
             viewModel.uiEvents.test {
                 viewModel.syncUsers()
-                advanceTimeBy(60000L)
+                advanceTimeBy(TIME_FOR_SYNC_USERS)
 
                 val item = awaitItem()
                 assertTrue(item is UiEvent.ShowToast)
@@ -213,7 +225,7 @@ class HomeViewModelTest {
                 cancelAndConsumeRemainingEvents()
             }
 
-            coVerify(exactly = 2) { scheduleRemoteSync.execute(60000L) }
+            coVerify(exactly = 2) { scheduleRemoteSync.execute(TIME_FOR_SYNC_USERS) }
         }
 
     @Test
@@ -227,7 +239,7 @@ class HomeViewModelTest {
 
             viewModel.uiEvents.test {
                 viewModel.syncUsers()
-                advanceTimeBy(60000L)
+                advanceTimeBy(TIME_FOR_SYNC_USERS)
 
                 val item = awaitItem()
 
@@ -237,6 +249,6 @@ class HomeViewModelTest {
                 cancelAndConsumeRemainingEvents()
             }
 
-            coVerify(exactly = 2) { scheduleRemoteSync.execute(60000L) }
+            coVerify(exactly = 2) { scheduleRemoteSync.execute(TIME_FOR_SYNC_USERS) }
         }
 }

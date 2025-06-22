@@ -116,6 +116,7 @@ fun DetailsUserScreen(
     }
 }
 
+
 @Preview
 @Composable
 fun DetailsScreenPreview() {

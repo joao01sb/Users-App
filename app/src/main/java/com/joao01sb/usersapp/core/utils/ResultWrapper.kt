@@ -11,3 +11,4 @@ sealed class ResultWrapper<out T> {
         is Error -> Error(error)
     }
 }
+

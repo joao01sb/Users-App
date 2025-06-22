@@ -6,3 +6,4 @@ import com.joao01sb.usersapp.core.utils.ResultWrapper
 data class UiState(
     val result: ResultWrapper<User> = ResultWrapper.Loading,
 )
+

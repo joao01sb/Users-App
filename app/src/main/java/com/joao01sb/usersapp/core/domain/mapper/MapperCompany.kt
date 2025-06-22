@@ -21,3 +21,4 @@ fun CompanyDto.toModel() = Company(
     catchPhrase = catchPhrase,
     bs = bs
 )
+
