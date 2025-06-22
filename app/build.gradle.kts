@@ -1,10 +1,13 @@
+import io.gitlab.arturbosch.detekt.Detekt
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp") version "2.1.21-2.0.1"
-    kotlin("plugin.serialization") version "1.9.0" 
+    kotlin("plugin.serialization") version "1.9.0"
     alias(libs.plugins.kotlinx.kover)
+    alias(libs.plugins.detekt)
 }
 
 kover {
@@ -22,8 +25,6 @@ kover {
             rule {
                 bound {
                     minValue = 50
-//                    counter = "LINE"
-//                    valueType = "COVERED_PERCENTAGE"
                 }
             }
         }
@@ -44,6 +45,20 @@ kover {
                     "com.joao01sb.usersapp.core.data.*",
                 )
             }
+        }
+    }
+}
+allprojects {
+    detekt {
+        toolVersion = libs.versions.detekt.get()
+        config.setFrom(file("$rootDir/config/detekt/detekt.yml"))
+    }
+
+    tasks.withType<Detekt>().configureEach {
+        reports {
+            xml.required.set(true)
+            html.required.set(true)
+            txt.required.set(false)
         }
     }
 }
