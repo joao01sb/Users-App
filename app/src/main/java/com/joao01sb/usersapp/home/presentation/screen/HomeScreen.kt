@@ -61,7 +61,7 @@ fun HomeScreen(
                 "All users", fontWeight = FontWeight.W600, modifier = Modifier
                     .testTag("homescreen_title")
             )
-            LazyColumn(modifier = Modifier.weight(1f)) {
+            LazyColumn(modifier = Modifier.weight(1f).testTag("lc_users")) {
                 items(uiState.users) {
                     UserComp(
                         modifier = Modifier.fillMaxWidth(),

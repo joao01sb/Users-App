@@ -1,4 +1,4 @@
-package com.joao01sb.usersapp
+package com.joao01sb.usersapp.home.presentation.fake
 
 import com.joao01sb.usersapp.core.data.local.entities.AddressEntity
 import com.joao01sb.usersapp.core.data.local.entities.CompanyEntity

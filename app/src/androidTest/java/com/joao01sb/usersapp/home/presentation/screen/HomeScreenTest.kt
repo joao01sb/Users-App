@@ -1,34 +1,32 @@
 package com.joao01sb.usersapp.home.presentation.screen
 
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.joao01sb.usersapp.MockUserFactory
-import com.joao01sb.usersapp.MockUserFactory.toModelForEntenty
-import com.joao01sb.usersapp.core.utils.UiEvent
-import com.joao01sb.usersapp.home.domain.usecase.LoadAndSyncUsers
-import com.joao01sb.usersapp.home.domain.usecase.ScheduleRemoteSync
+import com.joao01sb.usersapp.home.presentation.fake.FakeHomeViewModel
+import com.joao01sb.usersapp.home.presentation.fake.MockUserFactory
+import com.joao01sb.usersapp.home.presentation.fake.MockUserFactory.toModelForEntenty
 import com.joao01sb.usersapp.home.presentation.state.UiState
 import com.joao01sb.usersapp.home.presentation.viewmodel.HomeViewModel
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.GlobalContext.startKoin
+import org.koin.core.context.GlobalContext.stopKoin
+import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.module
 
 @OptIn(ExperimentalTestApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -36,6 +34,25 @@ class HomeScreenTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    @Before
+    fun setup() {
+        stopKoin()
+
+        startKoin {
+            modules(
+                module {
+                    viewModel<FakeHomeViewModel> { FakeHomeViewModel() }
+                }
+            )
+        }
+    }
+
+    @After
+    fun tearDown() {
+        stopKoin()
+    }
+
 
 
     @Test
@@ -74,12 +91,14 @@ class HomeScreenTest {
 
     @Test
     fun homeScreen_verify_users_list() {
-        val users = MockUserFactory.createUserListEntity().toModelForEntenty()
-        val uiState = UiState(
-            isLoading = false,
-            users = users
-        )
         composeTestRule.setContent {
+
+            val viewModel = FakeHomeViewModel()
+
+            viewModel.loadUsers()
+
+            val uiState = viewModel.uiState.value
+
             HomeScreen(
                 modifier = Modifier,
                 uiState = uiState,
@@ -89,16 +108,20 @@ class HomeScreenTest {
         }
         composeTestRule
             .onAllNodesWithTag("user_name")
-            .assertCountEquals(users.size)
+            .assertCountEquals(MockUserFactory.createUserListEntity().size)
 
     }
 
     @Test
     fun homeScreen_verify_error_message() {
-        val uiState = UiState(
-            isErro = Pair(true, "Erro ao carregar dados")
-        )
         composeTestRule.setContent {
+
+            val viewModel = FakeHomeViewModel()
+
+            viewModel.loadUsersError()
+
+            val uiState = viewModel.uiState.value
+
             HomeScreen(
                 modifier = Modifier,
                 uiState = uiState,
@@ -111,27 +134,42 @@ class HomeScreenTest {
     }
 
     @Test
-    fun homeScreen_verify_retry_action() {
-        val uiState = UiState(
-            isErro = Pair(true, "Erro ao carregar dados")
-        )
-
-        var retryIsClicked = false
+    fun homeScreen_verify_retry_action_simple() {
+        val viewModel = FakeHomeViewModel()
 
         composeTestRule.setContent {
+            val uiState by viewModel.uiState.collectAsState()
             HomeScreen(
-                modifier = Modifier,
                 uiState = uiState,
-                onRetry = {
-                    retryIsClicked = true
-                },
+                onRetry = { viewModel.loadUsers() },
                 onClickUser = {}
             )
         }
-        composeTestRule.onNodeWithTag("retry_button").assertTextEquals("Retry")
+
+        composeTestRule.runOnUiThread {
+            viewModel.loadUsersError()
+        }
+
+        composeTestRule.waitUntilExactlyOneExists(
+            hasTestTag("retry_button"),
+            timeoutMillis = 3000L
+        )
+        composeTestRule.onNodeWithTag("retry_button").assertIsDisplayed()
+
         composeTestRule.onNodeWithTag("retry_button").performClick()
 
-        assert(retryIsClicked)
+        composeTestRule.waitUntilDoesNotExist(
+            hasTestTag("retry_button"),
+            timeoutMillis = 5000L
+        )
+
+        composeTestRule.waitUntilAtLeastOneExists(
+            hasTestTag("user_name"),
+            timeoutMillis = 3000L
+        )
+        composeTestRule
+            .onAllNodesWithTag("user_name")
+            .assertCountEquals(MockUserFactory.createUserListEntity().size)
     }
 
 
