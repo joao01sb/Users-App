@@ -17,7 +17,6 @@ import com.joao01sb.usersapp.home.presentation.fake.FakeHomeViewModel
 import com.joao01sb.usersapp.home.presentation.fake.MockUserFactory
 import com.joao01sb.usersapp.home.presentation.fake.MockUserFactory.toModelForEntenty
 import com.joao01sb.usersapp.home.presentation.state.UiState
-import com.joao01sb.usersapp.home.presentation.viewmodel.HomeViewModel
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -171,7 +170,6 @@ class HomeScreenTest {
             .onAllNodesWithTag("user_name")
             .assertCountEquals(MockUserFactory.createUserListEntity().size)
     }
-
 
 
 }
