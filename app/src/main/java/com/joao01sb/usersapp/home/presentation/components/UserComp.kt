@@ -69,6 +69,7 @@ fun UserComp(
                 )
             }
             IconButton(
+                modifier = Modifier.testTag("user_button"),
                 onClick = { onClick(user.id) },
             ) {
                 Icon(
