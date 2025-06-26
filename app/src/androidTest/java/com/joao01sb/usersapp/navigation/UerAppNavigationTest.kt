@@ -2,6 +2,7 @@ package com.joao01sb.usersapp.navigation
 
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -19,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.joao01sb.usersapp.details.presentation.fake.FakeDetailsViewModel
 import com.joao01sb.usersapp.details.presentation.screen.DetailsUserScreen
 import com.joao01sb.usersapp.home.presentation.fake.FakeHomeViewModel
+import com.joao01sb.usersapp.home.presentation.fake.MockUserFactory
 import com.joao01sb.usersapp.home.presentation.screen.HomeScreen
 import com.joao01sb.usersapp.ui.navigation.destinations.DetailsScreen
 import com.joao01sb.usersapp.ui.navigation.destinations.HomeScreen
@@ -30,7 +32,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class UerAppNavigationTest {
-
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -48,7 +49,6 @@ class UerAppNavigationTest {
                 startDestination = HomeScreen()
             ) {
                 composable<HomeScreen> {
-
                     val state by viewModel.uiState.collectAsStateWithLifecycle()
                     HomeScreen(
                         uiState = state,
@@ -84,6 +84,31 @@ class UerAppNavigationTest {
         composeTestRule.onAllNodesWithTag("user_button").onFirst().performClick()
 
         composeTestRule.onNodeWithTag("details_screen_header").assertIsDisplayed()
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun homeScreen_virify_click_user_navigation_to_details_and_click_back_to_homeScreen() {
+        composeTestRule.runOnUiThread {
+            viewModel.loadUsers()
+        }
+
+        composeTestRule.waitUntilAtLeastOneExists(
+            hasTestTag("user_name"),
+            timeoutMillis = 3000L
+        )
+        composeTestRule.onAllNodesWithTag("user_button").onFirst().performClick()
+
+        composeTestRule.onNodeWithTag("details_screen_header").assertIsDisplayed()
+
+        composeTestRule.runOnUiThread {
+            navController.popBackStack()
+        }
+
+        composeTestRule
+            .onAllNodesWithTag("user_name")
+            .assertCountEquals(MockUserFactory.createUserListEntity().size)
+
     }
 
 }
