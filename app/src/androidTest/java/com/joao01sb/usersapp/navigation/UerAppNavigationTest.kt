@@ -1,6 +1,5 @@
 package com.joao01sb.usersapp.navigation
 
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
@@ -30,7 +29,7 @@ import org.junit.runner.RunWith
 
 
 @RunWith(AndroidJUnit4::class)
-class UerAppNavigation {
+class UerAppNavigationTest {
 
 
     @get:Rule

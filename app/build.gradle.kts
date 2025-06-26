@@ -154,7 +154,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    androidTestImplementation("androidx.navigation:navigation-testing:2.9.0")
+    androidTestImplementation(libs.androidx.navigation.testing)
+    androidTestImplementation(libs.google.truth)
 
     //test external libs
     testImplementation(libs.mockk)
