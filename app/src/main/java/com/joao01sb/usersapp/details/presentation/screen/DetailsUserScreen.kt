@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.joao01sb.usersapp.core.domain.model.Address
@@ -63,7 +64,9 @@ fun DetailsUserScreen(
                     .background(color = Color.Black),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(
+                    modifier = Modifier.testTag("progress_indicator_details")
+                )
             }
         }
         is ResultWrapper.Success<*> -> {
