@@ -8,6 +8,6 @@ const val DATABASE_VERSION = 1
 
 const val BASE_URL = "https://jsonplaceholder.typicode.com"
 
-const val USERS_ROUTE = "users"
+const val USERS_ROUTE = "/users"
 
 const val TIME_FOR_SYNC_USERS = 60000L
