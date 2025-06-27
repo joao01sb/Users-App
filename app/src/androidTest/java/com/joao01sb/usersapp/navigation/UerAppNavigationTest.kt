@@ -24,10 +24,12 @@ import com.joao01sb.usersapp.home.presentation.fake.MockUserFactory
 import com.joao01sb.usersapp.home.presentation.screen.HomeScreen
 import com.joao01sb.usersapp.ui.navigation.destinations.DetailsScreen
 import com.joao01sb.usersapp.ui.navigation.destinations.HomeScreen
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.GlobalContext.stopKoin
 
 
 @RunWith(AndroidJUnit4::class)
@@ -38,6 +40,7 @@ class UerAppNavigationTest {
     private lateinit var navController: TestNavHostController
 
     val viewModel = FakeHomeViewModel()
+    val viewModelDetails = FakeDetailsViewModel()
 
     @Before
     fun setup() {
@@ -59,7 +62,6 @@ class UerAppNavigationTest {
                     )
                 }
                 composable<DetailsScreen> { backStackEntry ->
-                    val viewModelDetails = FakeDetailsViewModel()
                     val stateDetails by viewModelDetails.stateDetails.collectAsStateWithLifecycle()
                     DetailsUserScreen(
                         state = stateDetails,
@@ -69,6 +71,13 @@ class UerAppNavigationTest {
             }
         }
     }
+
+    @After
+    fun tearDown() {
+        viewModelDetails.clearViewModel()
+        viewModel.clearViewModel()
+    }
+
 
     @OptIn(ExperimentalTestApi::class)
     @Test
@@ -82,6 +91,10 @@ class UerAppNavigationTest {
             timeoutMillis = 3000L
         )
         composeTestRule.onAllNodesWithTag("user_button").onFirst().performClick()
+
+        composeTestRule.runOnUiThread {
+            viewModelDetails.getUser()
+        }
 
         composeTestRule.onNodeWithTag("details_screen_header").assertIsDisplayed()
     }
@@ -99,6 +112,10 @@ class UerAppNavigationTest {
         )
         composeTestRule.onAllNodesWithTag("user_button").onFirst().performClick()
 
+        composeTestRule.runOnUiThread {
+            viewModelDetails.getUser()
+        }
+
         composeTestRule.onNodeWithTag("details_screen_header").assertIsDisplayed()
 
         composeTestRule.runOnUiThread {
@@ -109,6 +126,26 @@ class UerAppNavigationTest {
             .onAllNodesWithTag("user_name")
             .assertCountEquals(MockUserFactory.createUserListEntity().size)
 
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun verify_click_user_navigation_to_details_and_erro_find_user() {
+        composeTestRule.runOnUiThread {
+            viewModel.loadUsers()
+        }
+
+        composeTestRule.waitUntilAtLeastOneExists(
+            hasTestTag("user_name"),
+            timeoutMillis = 3000L
+        )
+        composeTestRule.onAllNodesWithTag("user_button").onFirst().performClick()
+
+        composeTestRule.runOnUiThread {
+            viewModelDetails.getUserError()
+        }
+
+        composeTestRule.onNodeWithTag("back_to_home").assertIsDisplayed()
     }
 
 }

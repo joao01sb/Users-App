@@ -34,6 +34,7 @@ fun UserDetailHeader(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
+            modifier = Modifier.testTag("user_name"),
             text = user.name,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,

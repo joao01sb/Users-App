@@ -51,7 +51,10 @@ fun DetailsUserScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = "Error: ${state.result.error.message}")
-                TextButton(onBack) {
+                TextButton(
+                    modifier = Modifier.testTag("back_to_home"),
+                    onClick = onBack
+                ) {
                     Text(text = "Back")
                 }
             }
@@ -61,12 +64,11 @@ fun DetailsUserScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(color = Color.Black),
+                    .background(color = Color.Black)
+                    .testTag("loading_indicator"),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.testTag("progress_indicator_details")
-                )
+                CircularProgressIndicator()
             }
         }
         is ResultWrapper.Success<*> -> {

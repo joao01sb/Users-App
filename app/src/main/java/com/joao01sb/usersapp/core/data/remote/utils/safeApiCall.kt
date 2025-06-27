@@ -18,14 +18,14 @@ suspend fun <T> safeApiCall(
     try {
         ResultWrapper.Success(apiCall())
     } catch (e: HttpException) {
-        ResultWrapper.Error(IOException("Erro HTTP ${e.code()}: ${e.message()}", e))
+        ResultWrapper.Error(IOException("Error HTTP ${e.code()}: ${e.message()}", e))
     } catch (e: SocketTimeoutException) {
-        ResultWrapper.Error(IOException("Tempo de resposta esgotado", e))
+        ResultWrapper.Error(IOException("Response timeout", e))
     } catch (e: UnknownHostException) {
-        ResultWrapper.Error(IOException("Sem conexão com a internet", e))
+        ResultWrapper.Error(IOException("No internet connection", e))
     } catch (e: JsonParseException) {
-        ResultWrapper.Error(IOException("Erro ao processar resposta do servidor", e))
+        ResultWrapper.Error(IOException("Error processing server response", e))
     } catch (e: IOException) {
-        ResultWrapper.Error(IOException("Erro de conexão", e))
+        ResultWrapper.Error(IOException("Connection error", e))
     }
 }

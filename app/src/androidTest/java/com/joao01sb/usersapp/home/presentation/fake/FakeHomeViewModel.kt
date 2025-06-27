@@ -24,6 +24,12 @@ class FakeHomeViewModel : ViewModel() {
     private val _uiEvents = MutableSharedFlow<UiEvent>()
     val uiEvents = _uiEvents.asSharedFlow()
 
+    fun clearViewModel() {
+        _uiState.update {
+            UiState()
+        }
+    }
+
     fun refresh() {
         _uiState.update { it.copy(isLoading = true) }
         _uiState.update {
